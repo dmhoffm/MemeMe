@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -127,7 +127,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="L15-OJ-obY">
-                                <rect key="frame" x="16" y="556" width="568" height="44"/>
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
                                 <items>
                                     <barButtonItem width="42" style="plain" systemItem="fixedSpace" id="LI6-F7-8EY"/>
                                     <barButtonItem systemItem="camera" id="PhA-QO-cMD">
@@ -145,10 +145,13 @@
                                 </items>
                             </toolbar>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hmY-VA-u8b">
-                                <rect key="frame" x="0.0" y="53" width="584" height="503"/>
+                                <rect key="frame" x="0.0" y="60" width="600" height="496"/>
                             </imageView>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4U8-LR-5i7">
-                                <rect key="frame" x="16" y="9" width="568" height="44"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="vV6-QW-HHK"/>
+                                </constraints>
                                 <items>
                                     <navigationItem title="MemeMe" id="dQ9-wV-Kev">
                                         <barButtonItem key="leftBarButtonItem" systemItem="action" id="ttD-X5-zTK">
@@ -165,7 +168,7 @@
                                 </items>
                             </navigationBar>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" placeholder="Top   " textAlignment="center" clearsOnBeginEditing="YES" minimumFontSize="20" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Rxe-x1-TP1">
-                                <rect key="frame" x="249" y="73" width="103" height="47"/>
+                                <rect key="frame" x="249" y="80" width="103" height="47"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="40"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
                             </textField>
@@ -178,16 +181,16 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="Rxe-x1-TP1" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" constant="0.5" id="0KP-KO-KBA"/>
-                            <constraint firstItem="4U8-LR-5i7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="-11" id="39F-dw-aXM"/>
+                            <constraint firstItem="4U8-LR-5i7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="-20" id="39F-dw-aXM"/>
                             <constraint firstItem="L15-OJ-obY" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="3fD-Of-6y7"/>
                             <constraint firstItem="zrM-3I-v2u" firstAttribute="bottom" secondItem="L15-OJ-obY" secondAttribute="top" constant="-20" id="NlM-QE-eRa"/>
-                            <constraint firstItem="L15-OJ-obY" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="Nlh-xg-KsC"/>
+                            <constraint firstItem="L15-OJ-obY" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" constant="16" id="Nlh-xg-KsC"/>
                             <constraint firstItem="Rxe-x1-TP1" firstAttribute="top" secondItem="4U8-LR-5i7" secondAttribute="bottom" constant="20" id="QG8-o8-aRv"/>
                             <constraint firstItem="hmY-VA-u8b" firstAttribute="top" secondItem="4U8-LR-5i7" secondAttribute="bottom" id="QaW-Na-Paf"/>
-                            <constraint firstItem="4U8-LR-5i7" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="Snc-OS-sPo"/>
-                            <constraint firstItem="hmY-VA-u8b" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="VbY-Th-Rre"/>
-                            <constraint firstItem="L15-OJ-obY" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="dfd-D4-4V8"/>
-                            <constraint firstItem="4U8-LR-5i7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="eax-OF-BMS"/>
+                            <constraint firstItem="4U8-LR-5i7" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" constant="16" id="Snc-OS-sPo"/>
+                            <constraint firstItem="hmY-VA-u8b" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" constant="16" id="VbY-Th-Rre"/>
+                            <constraint firstItem="L15-OJ-obY" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-16" id="Xyd-7d-2j7"/>
+                            <constraint firstItem="4U8-LR-5i7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-16" id="eax-OF-BMS"/>
                             <constraint firstItem="zrM-3I-v2u" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="gM3-j8-dt5"/>
                             <constraint firstItem="hmY-VA-u8b" firstAttribute="bottom" secondItem="L15-OJ-obY" secondAttribute="top" id="qPC-Cv-EVu"/>
                             <constraint firstItem="hmY-VA-u8b" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="urC-OB-xr0"/>

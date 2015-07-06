@@ -188,6 +188,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     // keyboard observers
     func keyboardWillShow(notification: NSNotification) {
         println("in Keyboardwillshow \(self.view.frame.origin.y)")
+        // disable share button
+        self.shareButtom.enabled = false
         
         //if view hasn't already been shifted and the keyboard will obscure the textfield being edited, then shift the view up
         if let textCGRect = self.currentTextFieldCGRect {
@@ -205,6 +207,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     func keyboardWillHide(notification: NSNotification) {
         println("in Keyboardwillhide \(self.view.frame.origin.y)")
+        // reenable share button
+        self.shareButtom.enabled = true
         if self.view.frame.origin.y < 0 {
             self.view.frame.origin.y += getKeyboardHeight(notification)
             println("update Keyboardwillhide \(self.view.frame.origin.y)")
