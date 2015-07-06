@@ -43,12 +43,14 @@ class MemeCollectionViewController: UIViewController, UINavigationControllerDele
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // collection call backs
+    // call backs
+    
+    // number of items in collection
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        println("collection count = \(self.memes.count)");
         return self.memes.count
     }
     
+    // create cell for display
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionCell", forIndexPath: indexPath) as! MemeCollectionViewCell
@@ -57,10 +59,10 @@ class MemeCollectionViewController: UIViewController, UINavigationControllerDele
         // Set the image
         cell.memedImage.image = meme.memedImage
         
-        
         return cell
     }
     
+    // select a cell the meme editing view
     func collectionView(collectionView: UICollectionView, didSelectCellAtIndexPath indexPath: NSIndexPath) {
         
         // get the Meme Edit View Controller
@@ -79,23 +81,11 @@ class MemeCollectionViewController: UIViewController, UINavigationControllerDele
         // set up collectionView data source and delegate
         self.memeCollection.dataSource = self
         self.memeCollection.delegate = self
-        // set up screen size parameters
-        screenSize = UIScreen.mainScreen().bounds
-        screenWidth = screenSize.width
-        screenHeight = screenSize.height
-        // set layout parameters
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 20, left: 0, bottom: 10, right: 0)
-        layout.itemSize = CGSize(width: screenWidth / 3, height: screenWidth / 3)
-        // self.memeCollection.setCollectionViewLayout(layout, animated: true)
     }
     
     // when view is about to appear, obtain memes array from model
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        
-        println("viewWillAppear")
     }
     
     // when view is about to dissappear

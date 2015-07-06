@@ -19,11 +19,16 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         }
     }
     
+    //
     // outlets
     
+    // meme table view
     @IBOutlet weak var memeTable: UITableView!
     
+    //
     // button actions
+    
+    // create (+) new meme
     @IBAction func addMeme(sender: UIBarButtonItem) {
         // get the Meme Edit View Controller
         let controller = self.presentingViewController as! MemeEditViewController
@@ -37,12 +42,15 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
+    //
     // table call backs
+    
+    // number of saved memes
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        println("table count = \(self.memes.count)");
         return self.memes.count
     }
     
+    // create meme table cell for display
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeCell") as! MemeTableViewCell
@@ -57,6 +65,7 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         return cell
     }
     
+    // select table cell and goto back to editor
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         // get the Meme Edit View Controller
@@ -81,10 +90,6 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     // when view is about to appear, obtain memes array from model
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        
-
-        println("viewWillAppear")
     }
     
     // when view is about to dissappear

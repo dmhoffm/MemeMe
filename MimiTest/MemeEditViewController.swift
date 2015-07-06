@@ -12,33 +12,39 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
 
     var selectedMeme: Meme? //selected Meme from table/collection
     var currentTextFieldCGRect: CGRect? //CGRect of text field when editing started
-    
-    // outlets
-    @IBOutlet weak var image: UIImageView!
-    
-    @IBOutlet weak var topText: UITextField!
-    
-    @IBOutlet weak var bottomText: UITextField!
-    
-    @IBOutlet weak var shareButtom: UIBarButtonItem!
-    
-    @IBOutlet weak var toolbar: UIToolbar!
-    
-    @IBOutlet weak var navigationBar: UINavigationBar!
-    
     var pickController = UIImagePickerController()
     
-        // button actions
+    //
+    // outlets
+    
+    @IBOutlet weak var image: UIImageView!      //main image on page
+    
+    @IBOutlet weak var topText: UITextField!    //top title
+    
+    @IBOutlet weak var bottomText: UITextField! //bottom title
+    
+    @IBOutlet weak var shareButtom: UIBarButtonItem!    //button for sharing the memed imaeg
+    
+    @IBOutlet weak var toolbar: UIToolbar!      //bottom toolbar (for hiding during image creation)
+    
+    @IBOutlet weak var navigationBar: UINavigationBar!  //top nav bar (for hiding during image creation)
+    
+    //
+    // button actions
+    
+    // "Album" button
     @IBAction func pick(sender: UIBarButtonItem) {
         // pick photo from camera roll using image picker
         takePicFrom(UIImagePickerControllerSourceType.SavedPhotosAlbum)
     }
 
+    // Camera button
     @IBAction func takePicture(sender: UIBarButtonItem) {
         // pick photo from camera roll using image picker
         takePicFrom(UIImagePickerControllerSourceType.PhotoLibrary)
     }
     
+    // Action button to share and/or save the current meme
     @IBAction func shareMeme(sender: UIBarButtonItem) {
         let meme = self.save()  // construct the meme object
         
@@ -58,6 +64,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         // now present the activity view
         self.presentViewController(controller, animated: true, completion: nil)
     }
+    
+    // "Cancel" button to return to saved meme table and collection views
     @IBAction func returnToAlbumViewController(sender: UIBarButtonItem) {
         // get the Meme View Controller
         var controller: UITabBarController
@@ -68,9 +76,10 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         self.presentViewController(controller, animated: true, completion: nil)
     }
     
+    //
     // call backs
     
-    // when view is loaded set up components
+    // when view is loaded, set up components
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -82,11 +91,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         setupText(self.bottomText)
     }
     
-    func userDidTapShare() {
-        //Implementation goes here ...
-    }
-    
-    // when view is about to appear
+    // when view is about to appear, subscribe to keyboard notifications and optionally set up picture and titles
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -116,6 +121,75 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         self.unsubscribeFromKeyboardNotifications()
     }
     
+    // keyboard observer when keyboard is about to appear
+    func keyboardWillShow(notification: NSNotification) {
+        // disable share button whenever the keyboard is visable
+        self.shareButtom.enabled = false
+        
+        //if view hasn't already been shifted and the keyboard will obscure the textfield being edited, then shift the view up
+        if let textCGRect = self.currentTextFieldCGRect {
+            let textfieldBottomYp1 = textCGRect.origin.y + textCGRect.height
+            let keyBoardHeight = getKeyboardHeight(notification)
+            let viewBottomYp1AfterKeyboard = self.view.frame.height + self.view.frame.origin.y - keyBoardHeight
+            if self.view.frame.origin.y >= 0 && textfieldBottomYp1 > viewBottomYp1AfterKeyboard {
+                self.view.frame.origin.y -= keyBoardHeight
+            }
+            
+        }
+    }
+    
+    //keyboard observier when keyboard is about to disappear
+    func keyboardWillHide(notification: NSNotification) {
+        // reenable share button
+        self.shareButtom.enabled = true
+        
+        // if view has been shifted up, put it back
+        if self.view.frame.origin.y < 0 {
+            self.view.frame.origin.y += getKeyboardHeight(notification)
+        }
+    }
+    
+    
+    
+    
+    //
+    // image picker delegates
+    
+    // when is image is selected, remember it and dismiss controller
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
+        // save selected image in controller image property
+        self.image.image = image
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    // dismiss picker without saving any image
+    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    //
+    // text field delegates
+    
+    // editing started
+    // clear out edits, remember position of textfield for possible reposition when keyboard shows
+    func textFieldDidBeginEditing(textField: UITextField) {
+        self.currentTextFieldCGRect = textField.frame
+        textField.text == ""
+    }
+    
+    // editing completed
+    func textFieldDidEndEditing(textField: UITextField) {
+        self.currentTextFieldCGRect = nil
+    }
+    
+    // hide keyboard when return is pressed
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    
+    //
     // utilities
     
     // goto photo pick controller
@@ -126,13 +200,13 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         self.presentViewController( self.pickController, animated: true, completion: nil)
     }
     
+    // set up meme text field
     static let memeTextAttributes = [
         NSStrokeColorAttributeName : UIColor.blackColor(),
         NSForegroundColorAttributeName : UIColor.whiteColor(),
         NSFontAttributeName : UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
         NSStrokeWidthAttributeName : -3.0 ]
     
-    // set up meme text field
     func setupText(field: UITextField) {
         field.delegate = self
         field.textAlignment = NSTextAlignment.Center
@@ -140,6 +214,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         field.minimumFontSize = 20
         field.defaultTextAttributes = MemeEditViewController.memeTextAttributes
         field.clearsOnBeginEditing = true
+        field.attributedPlaceholder = NSAttributedString(string: field.placeholder!,
+            attributes:[NSForegroundColorAttributeName: UIColor.orangeColor()])
     }
     
     // generate a composite memed image by taking a snapshot from the screen (sans toolbar and navbar)
@@ -163,56 +239,25 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         return memedImage
     }
     
-    
     // save a Meme
     func save() -> Meme {
         //Create the meme
         var meme = Meme( upperText: self.topText.text, lowerText: self.bottomText.text, image: self.image.image, memedImage: generateMemedImage())
-        //var meme = Meme( upperText: self.topText.text, lowerText: self.bottomText.text, image: self.image.image, memedImage: self.image.image)
         return meme
     }
     
-    // keyboard notification functions
+    // subscribe keyboard notifications to call keyboardWillShow and keyboardWillHide
     func subscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:"    , name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:"    , name: UIKeyboardWillHideNotification, object: nil)
     }
     
+    // unsubscribe keyboard notifications
     func unsubscribeFromKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().removeObserver(self, name:
             UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name:
             UIKeyboardWillHideNotification, object: nil)
-    }
-    
-    // keyboard observers
-    func keyboardWillShow(notification: NSNotification) {
-        println("in Keyboardwillshow \(self.view.frame.origin.y)")
-        // disable share button
-        self.shareButtom.enabled = false
-        
-        //if view hasn't already been shifted and the keyboard will obscure the textfield being edited, then shift the view up
-        if let textCGRect = self.currentTextFieldCGRect {
-            let textfieldBottomYp1 = textCGRect.origin.y + textCGRect.height
-            let keyBoardHeight = getKeyboardHeight(notification)
-            let viewBottomYp1AfterKeyboard = self.view.frame.height + self.view.frame.origin.y - keyBoardHeight
-            if self.view.frame.origin.y >= 0 && textfieldBottomYp1 > viewBottomYp1AfterKeyboard {
-                self.view.frame.origin.y -= keyBoardHeight
-                println("update Keyboardwillshow \(self.view.frame.origin.y)")
-            }
-
-        }
-    }
-    
-    
-    func keyboardWillHide(notification: NSNotification) {
-        println("in Keyboardwillhide \(self.view.frame.origin.y)")
-        // reenable share button
-        self.shareButtom.enabled = true
-        if self.view.frame.origin.y < 0 {
-            self.view.frame.origin.y += getKeyboardHeight(notification)
-            println("update Keyboardwillhide \(self.view.frame.origin.y)")
-        }
     }
     
     // determine keyboard size from notificaiton
@@ -221,45 +266,6 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue // of CGRect
         return keyboardSize.CGRectValue().height
     }
-
-
-    
-    
-    //
-    // image picker delegates
-    
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
-        // save selected image in controller image property
-        self.image.image = image
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    // dismiss picker without saving any image
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    //
-    // text field delegates
-    
-    // clear out edits
-    func textFieldDidBeginEditing(textField: UITextField) {
-        println("inDidBeginEditing")
-        self.currentTextFieldCGRect = textField.frame
-        textField.text == ""
-    }
-    
-    func textFieldDidEndEditing(textField: UITextField) {
-        println("inDidEndEditing")
-        self.currentTextFieldCGRect = nil
-    }
-    
-    // hide keyboard when return is pressed
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-
 
 }
 

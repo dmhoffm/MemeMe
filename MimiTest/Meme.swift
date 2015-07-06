@@ -12,11 +12,12 @@
 import Foundation
 import UIKit
 
+// every Meme has a...
 class Meme {
-    var upperText: String?
-    var lowerText: String?
-    var image: UIImage!
-    var memedImage: UIImage!
+    var upperText: String?  //upper title
+    var lowerText: String?  //lower title
+    var image: UIImage!     //original image
+    var memedImage: UIImage!//composite image including the titles
     
     // create meme if composite image is already available
     init(upperText: String?, lowerText: String?, image: UIImage!, memedImage: UIImage!) {
