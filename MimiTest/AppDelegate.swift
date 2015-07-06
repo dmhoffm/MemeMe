@@ -10,6 +10,9 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    // to save memes
+    var memes = [Meme]()
 
     var window: UIWindow?
 
