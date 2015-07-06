@@ -198,6 +198,7 @@
                     </view>
                     <connections>
                         <outlet property="bottomText" destination="zrM-3I-v2u" id="lqm-DV-i81"/>
+                        <outlet property="camera" destination="PhA-QO-cMD" id="qYw-SS-vDA"/>
                         <outlet property="image" destination="hmY-VA-u8b" id="cCd-J5-dYq"/>
                         <outlet property="navigationBar" destination="4U8-LR-5i7" id="1dF-gi-eu3"/>
                         <outlet property="shareButtom" destination="ttD-X5-zTK" id="Rm6-wP-KMd"/>

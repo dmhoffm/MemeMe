@@ -29,6 +29,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     @IBOutlet weak var navigationBar: UINavigationBar!  //top nav bar (for hiding during image creation)
     
+    @IBOutlet weak var camera: UIBarButtonItem! // camera button
     //
     // button actions
     
@@ -89,6 +90,13 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         // set up text fields
         setupText(self.topText)
         setupText(self.bottomText)
+        
+        // disable camera button if camera not available on device
+        if UIImagePickerController.availableCaptureModesForCameraDevice(.Rear) == nil {
+            self.camera.enabled = false
+        }
+        
+
     }
     
     // when view is about to appear, subscribe to keyboard notifications and optionally set up picture and titles
@@ -112,7 +120,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         } else {
             self.shareButtom.enabled = false
         }
-
+        
     }
     
     // when view is about to dissappear, unsubscribe to keyboard notifications
@@ -148,9 +156,6 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
             self.view.frame.origin.y += getKeyboardHeight(notification)
         }
     }
-    
-    
-    
     
     //
     // image picker delegates
