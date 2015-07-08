@@ -20,6 +20,8 @@ class MemeCollectionViewController: UIViewController, UINavigationControllerDele
         }
     }
     
+    var refresh = false //to force table refresh from another controller
+    
     // screen size parameters
     var screenSize: CGRect!
     var screenWidth: CGFloat!
@@ -31,22 +33,19 @@ class MemeCollectionViewController: UIViewController, UINavigationControllerDele
         
     // button actions
     @IBAction func addMeme(sender: UIBarButtonItem) {
+    
         // get the Meme Edit View Controller
-        let controller = self.presentingViewController as! MemeEditViewController
+        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController") as! MemeEditViewController
         
-        // set selected Meme to blank Meme Editor controller
-        controller.image.image = nil
-        controller.bottomText.text = nil
-        controller.topText.text = nil
-        
-        // return to meme editor
-        self.dismissViewControllerAnimated(true, completion: nil)
+        // alert to meme editor
+        self.presentViewController(controller, animated: true, completion: nil)
     }
     
     // call backs
     
     // number of items in collection
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        println("collection count=\(self.memes.count)")
         return self.memes.count
     }
     
@@ -81,16 +80,36 @@ class MemeCollectionViewController: UIViewController, UINavigationControllerDele
         // set up collectionView data source and delegate
         self.memeCollection.dataSource = self
         self.memeCollection.delegate = self
+        
+        // set up notifier to reload table
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshMemes:",name:"refreshMemes", object: nil)
     }
     
     // when view is about to appear, obtain memes array from model
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        // refresh collection if notified that it needs to be refreshed
+        if self.refresh {
+            println("refresh collection")
+            self.refresh = false
+            self.memeCollection.reloadData()
+        }
     }
     
     // when view is about to dissappear
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+    }
+    
+    // notifier function to cause Memes in table to be refreshed
+    func refreshMemes(notification: NSNotification) {
+        self.refresh = true
+    }
+    
+    // remove notifications when this controller goes away
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
     // utilities

@@ -19,10 +19,13 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         }
     }
     
+    var refresh = false //to force table refresh from another controller
+    
     //
     // outlets
     
     // meme table view
+
     @IBOutlet weak var memeTable: UITableView!
     
     //
@@ -31,15 +34,9 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     // create (+) new meme
     @IBAction func addMeme(sender: UIBarButtonItem) {
         // get the Meme Edit View Controller
-        let controller = self.presentingViewController as! MemeEditViewController
-        
-        // set selected Meme to blank Meme Editor controller
-        controller.image.image = nil
-        controller.bottomText.text = nil
-        controller.topText.text = nil
-        
-        // return to meme editor
-        self.dismissViewControllerAnimated(true, completion: nil)
+        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController")   as! UIViewController
+        // alert to meme editor
+        self.presentViewController(controller, animated: true,  completion: nil)
     }
     
     //
@@ -47,6 +44,7 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     
     // number of saved memes
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        println("count=\(self.memes.count)")
         return self.memes.count
     }
     
@@ -68,13 +66,15 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     // select table cell and goto back to editor
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        // get the Meme Edit View Controller
-        let controller = self.presentingViewController as! MemeEditViewController
-        controller.selectedMeme = self.memes[indexPath.row]
+        // get the Meme Detail View Controller
+        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
         
-        // return to meme editor with selected meme to re-edit the meme
-        self.dismissViewControllerAnimated(true, completion: nil)
+        // seed with index of selected Meme
+        controller.indexPath = indexPath
         
+        // push to meme editor
+        controller.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
     // when view is loaded set up components
@@ -85,16 +85,41 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         // set up tableView data source and delegate
         self.memeTable.dataSource = self
         self.memeTable.delegate = self
+        
+        // set up notifier to reload table
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshMemes:",name:"refreshMemes", object: nil)
+    }
+    
+    // remove notifications when this controller goes away
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
     // when view is about to appear, obtain memes array from model
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+
+        // refresh table if notified that it needs to be refreshed
+        if self.refresh {
+            println("refresh table")
+            self.refresh = false
+            self.memeTable.reloadData()
+        }
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     // when view is about to dissappear
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+    }
+
+    
+    // notifier function to cause Memes in table to be refreshed
+    func refreshMemes(notification: NSNotification) {
+        self.refresh = true
     }
     
     // utilities

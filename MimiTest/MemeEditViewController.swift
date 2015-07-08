@@ -59,6 +59,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
                 // Add it to the memes array in the Application Delegate
                 let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
                 appDelegate.memes.append(meme)
+                // let the parent controllers know of the change
+                NSNotificationCenter.defaultCenter().postNotificationName("refreshMemes", object: nil)
             }
         }
         
@@ -68,13 +70,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     // "Cancel" button to return to saved meme table and collection views
     @IBAction func returnToAlbumViewController(sender: UIBarButtonItem) {
-        // get the Meme View Controller
-        var controller: UITabBarController
-        
-        controller = self.storyboard?.instantiateViewControllerWithIdentifier("TabBarController") as! UITabBarController
-        
-        // bring up meme editor
-        self.presentViewController(controller, animated: true, completion: nil)
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     //

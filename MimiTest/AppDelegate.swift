@@ -11,7 +11,7 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    // to save memes
+    // to persist memes
     var memes = [Meme]()
 
     var window: UIWindow?
