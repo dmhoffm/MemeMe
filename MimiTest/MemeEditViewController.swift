@@ -10,7 +10,17 @@ import UIKit
 
 class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,      UINavigationControllerDelegate, UITextFieldDelegate {
 
-    var selectedMeme: Meme? //selected Meme from table/collection
+    // current saved meme array
+    var memes: [Meme]! {
+        get {
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            return appDelegate.memes
+        }
+        
+    }
+    
+    var indexPath: NSIndexPath? //index of selected Meme for editing, (nil if a meme needs to be created from scratch)
+    var sent: Bool = false     //meme has been sent or already exists
     var currentTextFieldCGRect: CGRect? //CGRect of text field when editing started
     var pickController = UIImagePickerController()
     
@@ -30,6 +40,9 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     @IBOutlet weak var navigationBar: UINavigationBar!  //top nav bar (for hiding during image creation)
     
     @IBOutlet weak var camera: UIBarButtonItem! // camera button
+
+    @IBOutlet weak var doneButton: UIBarButtonItem! //done editing button
+    
     //
     // button actions
     
@@ -59,8 +72,13 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
                 // Add it to the memes array in the Application Delegate
                 let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
                 appDelegate.memes.append(meme)
+                
                 // let the parent controllers know of the change
                 NSNotificationCenter.defaultCenter().postNotificationName("refreshMemes", object: nil)
+                
+                // indicate that a meme has been sent
+                self.sent = true
+                self.enableButtons()
             }
         }
         
@@ -68,8 +86,26 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         self.presentViewController(controller, animated: true, completion: nil)
     }
     
-    // "Cancel" button to return to saved meme table and collection views
+    // "Cancel" button to return to parent controller
     @IBAction func returnToAlbumViewController(sender: UIBarButtonItem) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    // "Done" button to save edited meme (only enabled if meme is being edited)
+    @IBAction func doneEditing(sender: UIBarButtonItem) {
+        // only save meme if one was under edit
+        if let row = self.indexPath?.row {
+            let meme = self.save()  // construct the meme object from the current display
+            
+            // replace meme being edited with the current displayed meme
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            appDelegate.memes[row] = meme
+            
+            // let the parent controllers know of the change
+            NSNotificationCenter.defaultCenter().postNotificationName("refreshMemes", object: nil)
+        }
+        
+        // return to parent controller
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
@@ -92,6 +128,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
             self.camera.enabled = false
         }
         
+        self.sent = false // initially no memes sent
 
     }
     
@@ -102,20 +139,19 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         // subscribe to keyboard notifications
         self.subscribeToKeyboardNotifications()
         
-        // seed editing with selected meme if it's set
-        if self.selectedMeme != nil {
-            self.image.image = self.selectedMeme?.image
-            self.bottomText.text = self.selectedMeme?.lowerText
-            self.topText.text = self.selectedMeme?.upperText
-            self.selectedMeme = nil
+        // seed editing with selected meme if it's set and no image has been initialized yet
+        let row =  self.indexPath?.row
+        if row != nil && self.image.image == nil {
+            self.sent = true //meme already exists
+            self.image.image = self.memes[row!].image
+            self.bottomText.text = self.memes[row!].lowerText
+            self.topText.text = self.memes[row!].upperText
+        } else {
+            self.sent = false //no meme exists yet
         }
         
-        // enable add share button if an image has been selected
-        if self.image.image != nil {
-            self.shareButtom.enabled = true
-        } else {
-            self.shareButtom.enabled = false
-        }
+        // enable done and share button if conditions met
+        enableButtons()
         
     }
     
@@ -127,8 +163,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     // keyboard observer when keyboard is about to appear
     func keyboardWillShow(notification: NSNotification) {
-        // disable share button whenever the keyboard is visable
-        self.shareButtom.enabled = false
+        // disable share and done buttons whenever the keyboard is visable
+        disableButtons()
         
         //if view hasn't already been shifted and the keyboard will obscure the textfield being edited, then shift the view up
         if let textCGRect = self.currentTextFieldCGRect {
@@ -144,8 +180,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     //keyboard observier when keyboard is about to disappear
     func keyboardWillHide(notification: NSNotification) {
-        // reenable share button
-        self.shareButtom.enabled = true
+        // reenable share and done buttons
+        enableButtons()
         
         // if view has been shifted up, put it back
         if self.view.frame.origin.y < 0 {
@@ -176,16 +212,22 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     func textFieldDidBeginEditing(textField: UITextField) {
         self.currentTextFieldCGRect = textField.frame
         textField.text == ""
+        // disable  button during editing
+        disableButtons()
     }
     
     // editing completed
     func textFieldDidEndEditing(textField: UITextField) {
         self.currentTextFieldCGRect = nil
+        // reenable buttons after editing
+        enableButtons()
     }
     
     // hide keyboard when return is pressed
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        // reenable buttons after editing
+        enableButtons()
         return true
     }
     
@@ -219,31 +261,54 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
             attributes:[NSForegroundColorAttributeName: UIColor.orangeColor()])
     }
     
-    // generate a composite memed image by taking a snapshot from the screen (sans toolbar and navbar)
-    func generateMemedImage() -> UIImage {
+    // generate a composite image by taking a snapshot from the screen
+    func generateScreenImage() -> UIImage {
         
+        // construct rect of image on screen
+        var newRect = CGRect(origin: CGPoint(x: 0.0, y: self.navigationBar.frame.height), size:
+            CGSize(width: self.image.frame.width, height: self.image.frame.height))
+
+        // Render view to an image
+        UIGraphicsBeginImageContext(self.view.frame.size)
+        self.view.drawViewHierarchyInRect(self.view.frame, afterScreenUpdates: true)
+        var screenImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        // make sure image cropped
+        screenImage = cropImage(screenImage, cropRect: newRect)
+        return screenImage
+    }
+    
+    // crop an image
+    func cropImage(image: UIImage, cropRect: CGRect) -> UIImage {
+        var cgImage = CGImageCreateWithImageInRect(image.CGImage, cropRect);
+        var img = UIImage(CGImage: cgImage);
+        return img!
+    }
+    
+    // create a Meme from the current screen
+    func save() -> Meme {
         // Hide toolbar and navbar
         self.toolbar.hidden = true
         self.navigationBar.hidden = true
         
-        // Render view to an image
-        UIGraphicsBeginImageContext(self.view.frame.size)
-        self.view.drawViewHierarchyInRect(self.view.frame, afterScreenUpdates: true)
-        let memedImage : UIImage =
-        UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        // obtained memed composite
+        var memedImage = generateScreenImage()
+        
+        // obtain original image
+        self.topText.hidden = true
+        self.bottomText.hidden = true
+        var origImage = generateScreenImage() //same aspect ration as memed image
+        self.topText.hidden = false
+        self.bottomText.hidden = false
+        
+        // construct memed object and put in save memes
+        var meme = Meme( upperText: self.topText.text, lowerText: self.bottomText.text, image: origImage, memedImage: memedImage)
         
         // Show toolbar and navbar
         self.toolbar.hidden = false
         self.navigationBar.hidden = false
         
-        return memedImage
-    }
-    
-    // save a Meme
-    func save() -> Meme {
-        //Create the meme
-        var meme = Meme( upperText: self.topText.text, lowerText: self.bottomText.text, image: self.image.image, memedImage: generateMemedImage())
         return meme
     }
     
@@ -266,6 +331,25 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         let userInfo = notification.userInfo
         let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue // of CGRect
         return keyboardSize.CGRectValue().height
+    }
+    
+    // enable share and done buttons if possible
+    func enableButtons() {
+        if self.image.image != nil {
+            self.shareButtom.enabled = true //enable share if image exists
+            if self.sent {
+                self.doneButton.enabled = true //enable done if image exists and meme sent or exists
+            }
+        } else { //conditions not met to share or finish editing
+            self.shareButtom.enabled = false
+            self.doneButton.enabled = false
+        }
+    }
+    
+    // disable share and done buttons
+    func disableButtons() {
+        self.shareButtom.enabled = false
+        self.doneButton.enabled = false
     }
 
 }

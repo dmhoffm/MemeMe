@@ -5,10 +5,10 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--Tab Bar Controller-->
+        <!--Tab Bar-->
         <scene sceneID="pxu-mJ-Bbl">
             <objects>
-                <tabBarController storyboardIdentifier="TabBarController" id="XvT-ZT-ucX" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="TabBarController" title="Tab Bar" id="XvT-ZT-ucX" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="FoB-vu-zPF"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="dZZ-vV-XKW">
@@ -25,10 +25,10 @@
             </objects>
             <point key="canvasLocation" x="-2322" y="345"/>
         </scene>
-        <!--MemeMe-->
+        <!--Meme Editor-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController storyboardIdentifier="MemeEditViewController" title="MemeMe" id="BYZ-38-t0r" customClass="MemeEditViewController" customModule="MimiTest" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MemeEditViewController" title="Meme Editor" id="BYZ-38-t0r" customClass="MemeEditViewController" customModule="MimiTest" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -47,6 +47,12 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="JLi-GW-NyU"/>
+                                    <barButtonItem title="Done" systemItem="done" id="S7K-I7-Xuu">
+                                        <connections>
+                                            <action selector="doneEditing:" destination="BYZ-38-t0r" id="wb0-au-rHP"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="UsP-CP-a1N"/>
                                     <barButtonItem title="Album" id="gdD-36-vD4">
                                         <connections>
                                             <action selector="pick:" destination="BYZ-38-t0r" id="HHr-tT-OT8"/>
@@ -110,6 +116,7 @@
                     <connections>
                         <outlet property="bottomText" destination="zrM-3I-v2u" id="lqm-DV-i81"/>
                         <outlet property="camera" destination="PhA-QO-cMD" id="qYw-SS-vDA"/>
+                        <outlet property="doneButton" destination="S7K-I7-Xuu" id="C8Y-0X-5DA"/>
                         <outlet property="image" destination="hmY-VA-u8b" id="cCd-J5-dYq"/>
                         <outlet property="navigationBar" destination="4U8-LR-5i7" id="1dF-gi-eu3"/>
                         <outlet property="shareButtom" destination="ttD-X5-zTK" id="Rm6-wP-KMd"/>
@@ -121,10 +128,10 @@
             </objects>
             <point key="canvasLocation" x="-1576" y="1775"/>
         </scene>
-        <!--Collection-->
+        <!--Collection Nav-->
         <scene sceneID="Y0q-QK-OKf">
             <objects>
-                <navigationController id="HCH-a9-Izo" sceneMemberID="viewController">
+                <navigationController title="Collection Nav" id="HCH-a9-Izo" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Collection" id="dUV-pa-btx"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="7m9-ma-oFP">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -138,10 +145,10 @@
             </objects>
             <point key="canvasLocation" x="-1576" y="1085"/>
         </scene>
-        <!--CollectionView-->
+        <!--Sent Memes Collection-->
         <scene sceneID="X3v-l0-mp2">
             <objects>
-                <viewController storyboardIdentifier="MemeCollectionViewController" title="CollectionView" id="042-40-R8j" customClass="MemeCollectionViewController" customModule="MimiTest" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MemeCollectionViewController" title="Sent Memes Collection" id="042-40-R8j" customClass="MemeViewController" customModule="MimiTest" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="AeS-Uh-GIg"/>
                         <viewControllerLayoutGuide type="bottom" id="q6c-qF-9fp"/>
@@ -196,7 +203,7 @@
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" id="whK-uU-7QI"/>
-                    <navigationItem key="navigationItem" title="Sent Memes" id="U72-Cj-TKP">
+                    <navigationItem key="navigationItem" title="Memes" id="U72-Cj-TKP">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="GF7-iU-mkt">
                             <connections>
                                 <action selector="addMeme:" destination="042-40-R8j" id="VWI-MB-IG5"/>
@@ -241,17 +248,17 @@
                                     <barButtonItem width="42" style="plain" systemItem="fixedSpace" id="VzN-nc-FaC"/>
                                 </items>
                             </toolbar>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Txz-3b-cNU">
-                                <rect key="frame" x="0.0" y="60" width="600" height="496"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Txz-3b-cNU">
+                                <rect key="frame" x="0.0" y="20" width="600" height="536"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Txz-3b-cNU" firstAttribute="bottom" secondItem="KCa-D2-VvC" secondAttribute="top" id="1Gc-CP-kcF"/>
                             <constraint firstItem="KCa-D2-VvC" firstAttribute="leading" secondItem="czD-gc-jHF" secondAttribute="leadingMargin" constant="-16" id="CR8-uz-dmw"/>
                             <constraint firstItem="Txz-3b-cNU" firstAttribute="trailing" secondItem="czD-gc-jHF" secondAttribute="trailingMargin" constant="16" id="VcE-1F-2aP"/>
+                            <constraint firstItem="Txz-3b-cNU" firstAttribute="bottom" secondItem="KCa-D2-VvC" secondAttribute="top" id="eg3-qQ-sk9"/>
+                            <constraint firstItem="Txz-3b-cNU" firstAttribute="top" secondItem="S5p-fp-VkJ" secondAttribute="bottom" id="gkq-u9-LH6"/>
                             <constraint firstItem="Txz-3b-cNU" firstAttribute="leading" secondItem="czD-gc-jHF" secondAttribute="leading" id="hQa-sl-p0y"/>
-                            <constraint firstItem="KCa-D2-VvC" firstAttribute="top" secondItem="Txz-3b-cNU" secondAttribute="bottom" id="lEd-Sr-Q98"/>
                             <constraint firstItem="KCa-D2-VvC" firstAttribute="bottom" secondItem="UGT-dD-17i" secondAttribute="top" id="poM-00-qWq"/>
                             <constraint firstItem="KCa-D2-VvC" firstAttribute="trailing" secondItem="czD-gc-jHF" secondAttribute="trailingMargin" constant="16" id="v2P-iI-klU"/>
                         </constraints>
@@ -264,10 +271,10 @@
             </objects>
             <point key="canvasLocation" x="-171" y="333"/>
         </scene>
-        <!--Saved Memes-->
+        <!--Sent Memes Table-->
         <scene sceneID="L8o-ay-bsO">
             <objects>
-                <viewController title="Saved Memes" id="nvm-Yx-smY" customClass="MemeViewController" customModule="MimiTest" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Sent Memes Table" id="nvm-Yx-smY" customClass="MemeViewController" customModule="MimiTest" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="viE-na-aCE"/>
                         <viewControllerLayoutGuide type="bottom" id="V4A-Is-S6W"/>
@@ -338,10 +345,10 @@
             </objects>
             <point key="canvasLocation" x="-877" y="333"/>
         </scene>
-        <!--Table-->
+        <!--Table Nav-->
         <scene sceneID="12z-Px-C9c">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hGC-Il-aoR" sceneMemberID="viewController">
+                <navigationController title="Table Nav" automaticallyAdjustsScrollViewInsets="NO" id="hGC-Il-aoR" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Table" id="FY3-wL-Huf"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="I6a-tN-c72"/>

@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class MemeViewController: UIViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate {
+class MemeViewController: UIViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate,UICollectionViewDataSource, UICollectionViewDelegate {
     
     // current saved meme array
     var memes: [Meme]! {
@@ -24,8 +24,10 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     //
     // outlets
     
-    // meme table view
+    // meme collection view
+    @IBOutlet weak var memeCollection: UICollectionView!
 
+    // meme table view
     @IBOutlet weak var memeTable: UITableView!
     
     //
@@ -34,8 +36,12 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     // create (+) new meme
     @IBAction func addMeme(sender: UIBarButtonItem) {
         // get the Meme Edit View Controller
-        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController")   as! UIViewController
-        // alert to meme editor
+        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController")   as! MemeEditViewController
+        
+        // indicated need to create meme
+        controller.indexPath = nil
+        
+        // push to meme editor
         self.presentViewController(controller, animated: true,  completion: nil)
     }
     
@@ -44,8 +50,7 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     
     // number of saved memes
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        println("count=\(self.memes.count)")
-        return self.memes.count
+        return numberOfMemes()
     }
     
     // create meme table cell for display
@@ -63,28 +68,52 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         return cell
     }
     
-    // select table cell and goto back to editor
+    // select table cell and goto back to detail view
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+
+        pushToMemeDetailFor(indexPath)
+    }
+    
+    //
+    // collection view callbacks
+    // number of items in collection
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return numberOfMemes()
+    }
+    
+    // create cell for display
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
-        // get the Meme Detail View Controller
-        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionCell", forIndexPath: indexPath) as! MemeCollectionViewCell
+        let meme = self.memes[indexPath.row]
         
-        // seed with index of selected Meme
-        controller.indexPath = indexPath
+        // Set the image
+        cell.memedImage.image = meme.memedImage
         
-        // push to meme editor
-        controller.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(controller, animated: true)
+        return cell
+    }
+    
+    // select collection item and push to the meme detail view
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        
+        pushToMemeDetailFor(indexPath)
     }
     
     // when view is loaded set up components
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         // set up tableView data source and delegate
-        self.memeTable.dataSource = self
-        self.memeTable.delegate = self
+        if let tableView = self.memeTable {
+            tableView.dataSource = self
+            tableView.delegate = self
+        }
+        
+        // set up collectionView data source and delegate
+        if let collectionView = self.memeCollection {
+            collectionView.dataSource = self
+            collectionView.delegate = self
+        }
         
         // set up notifier to reload table
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshMemes:",name:"refreshMemes", object: nil)
@@ -101,12 +130,17 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
 
         // refresh table if notified that it needs to be refreshed
         if self.refresh {
-            println("refresh table")
             self.refresh = false
-            self.memeTable.reloadData()
+            if let tableView = self.memeTable {
+                tableView.reloadData()
+            }
+            if let collectionView = self.memeCollection {
+                collectionView.reloadData()
+            }
         }
     }
     
+    // when view is about to appear
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
     }
@@ -124,6 +158,26 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     
     // utilities
     
+    //
+    // Memes database related
     
+    // current numebr of memes
+    func numberOfMemes() -> Int {
+        return self.memes.count
+    }
+    
+    // push to Meme detail view for index in Memes
+    func pushToMemeDetailFor(indexPath: NSIndexPath) {
+        
+        // get the Meme Detail View Controller
+        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
+        
+        // seed with index of selected Meme
+        controller.indexPath = indexPath
+        
+        // push to meme editor
+        controller.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
     
 }

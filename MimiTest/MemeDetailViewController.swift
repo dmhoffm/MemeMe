@@ -23,6 +23,8 @@ class MemeDetailViewController: UIViewController,    UINavigationControllerDeleg
     }
     
     var indexPath: NSIndexPath? //selected Meme index from table/collection
+ 
+    var refresh = false //to force image refresh from another controller
     
     //
     // outlets
@@ -55,10 +57,10 @@ class MemeDetailViewController: UIViewController,    UINavigationControllerDeleg
     @IBAction func editMeme(sender: UIBarButtonItem) {
         // get the Meme Edit View Controller
         let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController") as! MemeEditViewController
-        //
+        
         // seed with memed image of selected meme 
         if let row = self.indexPath?.row {
-            controller.selectedMeme = self.memes[row]
+            controller.indexPath = self.indexPath
         }
         
         // present meme editor
@@ -72,25 +74,45 @@ class MemeDetailViewController: UIViewController,    UINavigationControllerDeleg
     // when view is loaded, set up components
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
+        // set up notifier to reload table
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshMemes:",name:"refreshMemes", object: nil)
     }
+    
+    // remove notifications when this controller goes away
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
     
     // when view is about to appear,  set up picture
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        // set to fill screen
+        self.image.contentMode = UIViewContentMode.ScaleAspectFill
         
         // seed with memed image of selected meme if it's set
         if let row = self.indexPath?.row {
             self.image.image = self.memes[row].memedImage
         }
         
+        // refresh image if notified that it needs to be refreshed
+        if self.refresh {
+            self.refresh = false
+            self.view.setNeedsDisplay()
+        }
     }
     
     // when view is about to dissappear
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        
+    }
+    
+    // notifier function to cause Memes  to be refreshed
+    func refreshMemes(notification: NSNotification) {
+        // set refresh notification to force repaint of screen next time it appears
+        self.refresh = true
     }
     
     
