@@ -194,8 +194,18 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     // when is image is selected, remember it and dismiss controller
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
-        // save selected image in controller image property
+        
+        // resize original image from library (make sure titles are hidden)
         self.image.image = image
+        self.bottomText.hidden = true
+        self.topText.hidden = true
+        var resizedImage = generateScreenImage() //same aspect ratio as memed image
+        self.bottomText.hidden = false
+        self.topText.hidden = false
+        
+        // save selected image in controller image property
+        self.image.image = resizedImage
+        
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
@@ -288,26 +298,11 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     // create a Meme from the current screen
     func save() -> Meme {
-        // Hide toolbar and navbar
-        self.toolbar.hidden = true
-        self.navigationBar.hidden = true
-        
         // obtained memed composite
         var memedImage = generateScreenImage()
         
-        // obtain original image
-        self.topText.hidden = true
-        self.bottomText.hidden = true
-        var origImage = generateScreenImage() //same aspect ration as memed image
-        self.topText.hidden = false
-        self.bottomText.hidden = false
-        
         // construct memed object and put in save memes
-        var meme = Meme( upperText: self.topText.text, lowerText: self.bottomText.text, image: origImage, memedImage: memedImage)
-        
-        // Show toolbar and navbar
-        self.toolbar.hidden = false
-        self.navigationBar.hidden = false
+        var meme = Meme( upperText: self.topText.text, lowerText: self.bottomText.text, image: self.image.image, memedImage: memedImage)
         
         return meme
     }
