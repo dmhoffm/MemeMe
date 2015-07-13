@@ -40,15 +40,15 @@ class MemeDetailViewController: UIViewController,    UINavigationControllerDeleg
     @IBAction func deleteMeme(sender: UIBarButtonItem) {
         //
         // seed with memed image of selected meme
-        if let row = self.indexPath?.row {
-            if row < self.memes.count {
+        if let row = indexPath?.row {
+            if row < memes.count {
                 // remove element from saved memes
                 let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
                 appDelegate.memes.removeAtIndex(row)
                 // let the parent controllers know of the change
                 NSNotificationCenter.defaultCenter().postNotificationName("refreshMemes", object: nil)
                 // return to previous view
-                self.navigationController?.popViewControllerAnimated(true)
+                navigationController?.popViewControllerAnimated(true)
             }
         }
     }
@@ -56,15 +56,15 @@ class MemeDetailViewController: UIViewController,    UINavigationControllerDeleg
     // Edit button
     @IBAction func editMeme(sender: UIBarButtonItem) {
         // get the Meme Edit View Controller
-        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController") as! MemeEditViewController
+        let controller = storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController") as! MemeEditViewController
         
         // seed with memed image of selected meme 
-        if let row = self.indexPath?.row {
-            controller.indexPath = self.indexPath
+        if let row = indexPath?.row {
+            controller.indexPath = indexPath
         }
         
         // present meme editor
-        self.presentViewController(controller, animated: true, completion: nil)
+        presentViewController(controller, animated: true, completion: nil)
     }
 
     
@@ -90,17 +90,17 @@ class MemeDetailViewController: UIViewController,    UINavigationControllerDeleg
         super.viewWillAppear(animated)
         
         // set to fill screen
-        self.image.contentMode = UIViewContentMode.ScaleAspectFill
+        image.contentMode = UIViewContentMode.ScaleAspectFill
         
         // seed with memed image of selected meme if it's set
-        if let row = self.indexPath?.row {
-            self.image.image = self.memes[row].memedImage
+        if let row = indexPath?.row {
+            image.image = memes[row].memedImage
         }
         
         // refresh image if notified that it needs to be refreshed
-        if self.refresh {
-            self.refresh = false
-            self.view.setNeedsDisplay()
+        if refresh {
+            refresh = false
+            view.setNeedsDisplay()
         }
     }
     
@@ -112,7 +112,7 @@ class MemeDetailViewController: UIViewController,    UINavigationControllerDeleg
     // notifier function to cause Memes  to be refreshed
     func refreshMemes(notification: NSNotification) {
         // set refresh notification to force repaint of screen next time it appears
-        self.refresh = true
+        refresh = true
     }
     
     

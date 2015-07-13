@@ -55,12 +55,12 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     // Camera button
     @IBAction func takePicture(sender: UIBarButtonItem) {
         // pick photo from camera roll using image picker
-        takePicFrom(UIImagePickerControllerSourceType.PhotoLibrary)
+        takePicFrom(UIImagePickerControllerSourceType.Camera)
     }
     
     // Action button to share and/or save the current meme
     @IBAction func shareMeme(sender: UIBarButtonItem) {
-        let meme = self.save()  // construct the meme object
+        let meme = save()  // construct the meme object
         
         // construct the activity view controller and seed it with the memed image
         let controller = UIActivityViewController(activityItems: [meme.memedImage], applicationActivities: nil)
@@ -83,19 +83,19 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         }
         
         // now present the activity view
-        self.presentViewController(controller, animated: true, completion: nil)
+        presentViewController(controller, animated: true, completion: nil)
     }
     
     // "Cancel" button to return to parent controller
     @IBAction func returnToAlbumViewController(sender: UIBarButtonItem) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     // "Done" button to save edited meme (only enabled if meme is being edited)
     @IBAction func doneEditing(sender: UIBarButtonItem) {
         // only save meme if one was under edit
-        if let row = self.indexPath?.row {
-            let meme = self.save()  // construct the meme object from the current display
+        if let row = indexPath?.row {
+            let meme = save()  // construct the meme object from the current display
             
             // replace meme being edited with the current displayed meme
             let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -106,7 +106,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         }
         
         // return to parent controller
-        self.dismissViewControllerAnimated(true, completion: nil)
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     //
@@ -117,18 +117,18 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         // set up delegate for pickController
-        self.pickController.delegate = self
+        pickController.delegate = self
         
         // set up text fields
-        setupText(self.topText)
-        setupText(self.bottomText)
+        setupText(topText)
+        setupText(bottomText)
         
         // disable camera button if camera not available on device
         if UIImagePickerController.availableCaptureModesForCameraDevice(.Rear) == nil {
-            self.camera.enabled = false
+            camera.enabled = false
         }
         
-        self.sent = false // initially no memes sent
+        sent = false // initially no memes sent
 
     }
     
@@ -137,17 +137,17 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         super.viewWillAppear(animated)
         
         // subscribe to keyboard notifications
-        self.subscribeToKeyboardNotifications()
+        subscribeToKeyboardNotifications()
         
         // seed editing with selected meme if it's set and no image has been initialized yet
-        let row =  self.indexPath?.row
-        if row != nil && self.image.image == nil {
-            self.sent = true //meme already exists
-            self.image.image = self.memes[row!].image
-            self.bottomText.text = self.memes[row!].lowerText
-            self.topText.text = self.memes[row!].upperText
+        let row =  indexPath?.row
+        if row != nil && image.image == nil {
+            sent = true //meme already exists
+            image.image = memes[row!].image
+            bottomText.text = memes[row!].lowerText
+            topText.text = memes[row!].upperText
         } else {
-            self.sent = false //no meme exists yet
+            sent = false //no meme exists yet
         }
         
         // enable done and share button if conditions met
@@ -158,7 +158,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     // when view is about to dissappear, unsubscribe to keyboard notifications
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        self.unsubscribeFromKeyboardNotifications()
+        unsubscribeFromKeyboardNotifications()
     }
     
     // keyboard observer when keyboard is about to appear
@@ -167,12 +167,12 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         disableButtons()
         
         //if view hasn't already been shifted and the keyboard will obscure the textfield being edited, then shift the view up
-        if let textCGRect = self.currentTextFieldCGRect {
+        if let textCGRect = currentTextFieldCGRect {
             let textfieldBottomYp1 = textCGRect.origin.y + textCGRect.height
             let keyBoardHeight = getKeyboardHeight(notification)
-            let viewBottomYp1AfterKeyboard = self.view.frame.height + self.view.frame.origin.y - keyBoardHeight
-            if self.view.frame.origin.y >= 0 && textfieldBottomYp1 > viewBottomYp1AfterKeyboard {
-                self.view.frame.origin.y -= keyBoardHeight
+            let viewBottomYp1AfterKeyboard = view.frame.height + view.frame.origin.y - keyBoardHeight
+            if view.frame.origin.y >= 0 && textfieldBottomYp1 > viewBottomYp1AfterKeyboard {
+                view.frame.origin.y -= keyBoardHeight
             }
             
         }
@@ -184,8 +184,8 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         enableButtons()
         
         // if view has been shifted up, put it back
-        if self.view.frame.origin.y < 0 {
-            self.view.frame.origin.y += getKeyboardHeight(notification)
+        if view.frame.origin.y < 0 {
+            view.frame.origin.y += getKeyboardHeight(notification)
         }
     }
     
@@ -197,21 +197,21 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         
         // resize original image from library (make sure titles are hidden)
         self.image.image = image
-        self.bottomText.hidden = true
-        self.topText.hidden = true
+        bottomText.hidden = true
+        topText.hidden = true
         var resizedImage = generateScreenImage() //same aspect ratio as memed image
-        self.bottomText.hidden = false
-        self.topText.hidden = false
+        bottomText.hidden = false
+        topText.hidden = false
         
         // save selected image in controller image property
         self.image.image = resizedImage
         
-        self.dismissViewControllerAnimated(true, completion: nil)
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     // dismiss picker without saving any image
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     //
@@ -220,15 +220,18 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     // editing started
     // clear out edits, remember position of textfield for possible reposition when keyboard shows
     func textFieldDidBeginEditing(textField: UITextField) {
-        self.currentTextFieldCGRect = textField.frame
-        textField.text == ""
+        currentTextFieldCGRect = textField.frame
+        // clear text if current text is just place holder text
+        if textField.text == textField.placeholder {
+           textField.text == ""
+        }
         // disable  button during editing
         disableButtons()
     }
     
     // editing completed
     func textFieldDidEndEditing(textField: UITextField) {
-        self.currentTextFieldCGRect = nil
+        currentTextFieldCGRect = nil
         // reenable buttons after editing
         enableButtons()
     }
@@ -248,9 +251,9 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     // goto photo pick controller
     func takePicFrom(source: UIImagePickerControllerSourceType) {
         // pick photo from source using image picker
-        self.pickController.sourceType = source
-        self.image.contentMode = UIViewContentMode.ScaleAspectFill
-        self.presentViewController( self.pickController, animated: true, completion: nil)
+        pickController.sourceType = source
+        image.contentMode = UIViewContentMode.ScaleAspectFill
+        presentViewController( pickController, animated: true, completion: nil)
     }
     
     // set up meme text field
@@ -266,7 +269,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         field.adjustsFontSizeToFitWidth = true
         field.minimumFontSize = 20
         field.defaultTextAttributes = MemeEditViewController.memeTextAttributes
-        field.clearsOnBeginEditing = true
+        field.clearsOnBeginEditing = false
         field.attributedPlaceholder = NSAttributedString(string: field.placeholder!,
             attributes:[NSForegroundColorAttributeName: UIColor.orangeColor()])
     }
@@ -275,12 +278,12 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     func generateScreenImage() -> UIImage {
         
         // construct rect of image on screen
-        var newRect = CGRect(origin: CGPoint(x: 0.0, y: self.navigationBar.frame.height), size:
-            CGSize(width: self.image.frame.width, height: self.image.frame.height))
+        var newRect = CGRect(origin: CGPoint(x: 0.0, y: navigationBar.frame.height), size:
+            CGSize(width: image.frame.width, height: image.frame.height))
 
         // Render view to an image
-        UIGraphicsBeginImageContext(self.view.frame.size)
-        self.view.drawViewHierarchyInRect(self.view.frame, afterScreenUpdates: true)
+        UIGraphicsBeginImageContext(view.frame.size)
+        view.drawViewHierarchyInRect(view.frame, afterScreenUpdates: true)
         var screenImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
 
@@ -302,7 +305,7 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
         var memedImage = generateScreenImage()
         
         // construct memed object and put in save memes
-        var meme = Meme( upperText: self.topText.text, lowerText: self.bottomText.text, image: self.image.image, memedImage: memedImage)
+        var meme = Meme( upperText: topText.text, lowerText: bottomText.text, image: image.image, memedImage: memedImage)
         
         return meme
     }
@@ -330,21 +333,20 @@ class MemeEditViewController: UIViewController, UIImagePickerControllerDelegate,
     
     // enable share and done buttons if possible
     func enableButtons() {
-        if self.image.image != nil {
-            self.shareButtom.enabled = true //enable share if image exists
-            if self.sent {
-                self.doneButton.enabled = true //enable done if image exists and meme sent or exists
+        if image.image != nil {
+            shareButtom.enabled = true //enable share if image exists
+            if sent {
+                doneButton.enabled = true //enable done if image exists and meme sent or exists
             }
         } else { //conditions not met to share or finish editing
-            self.shareButtom.enabled = false
-            self.doneButton.enabled = false
+            disableButtons()
         }
     }
     
     // disable share and done buttons
     func disableButtons() {
-        self.shareButtom.enabled = false
-        self.doneButton.enabled = false
+        shareButtom.enabled = false
+        doneButton.enabled = false
     }
 
 }

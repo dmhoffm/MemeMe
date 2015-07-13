@@ -36,13 +36,13 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     // create (+) new meme
     @IBAction func addMeme(sender: UIBarButtonItem) {
         // get the Meme Edit View Controller
-        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController")   as! MemeEditViewController
+        let controller = storyboard?.instantiateViewControllerWithIdentifier("MemeEditViewController")   as! MemeEditViewController
         
         // indicated need to create meme
         controller.indexPath = nil
         
         // push to meme editor
-        self.presentViewController(controller, animated: true,  completion: nil)
+        presentViewController(controller, animated: true,  completion: nil)
     }
     
     //
@@ -57,7 +57,7 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeCell") as! MemeTableViewCell
-        let meme = self.memes[indexPath.row]
+        let meme = memes[indexPath.row]
         
         // Set the image
         cell.memeImage.image = meme.memedImage
@@ -85,7 +85,7 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionCell", forIndexPath: indexPath) as! MemeCollectionViewCell
-        let meme = self.memes[indexPath.row]
+        let meme = memes[indexPath.row]
         
         // Set the image
         cell.memedImage.image = meme.memedImage
@@ -104,13 +104,13 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         super.viewDidLoad()
         
         // set up tableView data source and delegate
-        if let tableView = self.memeTable {
+        if let tableView = memeTable {
             tableView.dataSource = self
             tableView.delegate = self
         }
         
         // set up collectionView data source and delegate
-        if let collectionView = self.memeCollection {
+        if let collectionView = memeCollection {
             collectionView.dataSource = self
             collectionView.delegate = self
         }
@@ -129,12 +129,12 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
         super.viewWillAppear(animated)
 
         // refresh table if notified that it needs to be refreshed
-        if self.refresh {
-            self.refresh = false
-            if let tableView = self.memeTable {
+        if refresh {
+            refresh = false
+            if let tableView = memeTable {
                 tableView.reloadData()
             }
-            if let collectionView = self.memeCollection {
+            if let collectionView = memeCollection {
                 collectionView.reloadData()
             }
         }
@@ -153,7 +153,7 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     
     // notifier function to cause Memes in table to be refreshed
     func refreshMemes(notification: NSNotification) {
-        self.refresh = true
+        refresh = true
     }
     
     // utilities
@@ -163,21 +163,21 @@ class MemeViewController: UIViewController, UINavigationControllerDelegate, UITa
     
     // current numebr of memes
     func numberOfMemes() -> Int {
-        return self.memes.count
+        return memes.count
     }
     
     // push to Meme detail view for index in Memes
     func pushToMemeDetailFor(indexPath: NSIndexPath) {
         
         // get the Meme Detail View Controller
-        let controller = self.storyboard?.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
+        let controller = storyboard?.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
         
         // seed with index of selected Meme
         controller.indexPath = indexPath
         
         // push to meme editor
         controller.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(controller, animated: true)
+        navigationController?.pushViewController(controller, animated: true)
     }
     
 }
